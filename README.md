@@ -8,21 +8,15 @@ A flexible Play framework 2.1 crud module. This module is in development, many f
 
 Add repository (snapshots for now) in `Build.scala` to your resolvers
 
-	```scala
 	resolvers += "njin github repository (snapshots)" at "http://njin-fr.github.com/repository/snapshots"
-	```
-	
+
 Add the core module dependency
 
-	```scala
 	"fr.njin" % "play-crud" % "1.0.0-SNAPSHOT"
-	```
 
 Add your data provider (only ebean for now)
 
-	```scala	
     "fr.njin" % "play-crud-ebean" % "1.0.0-SNAPSHOT"
-    ```
     
 ### Initialize
 
@@ -30,15 +24,12 @@ play-crud use play-2.1 controller instances for his routes (see [Managing Contro
 
 First, initialize the manager on your application start:
 
-	```java
 	ControllersManager.init(new EbeanModelRegistry(application),
                 new ClasspathScannerControllerRegistry(application),
                 new EbeanDataProviderFactory());
-	```
 	
 Then, provide the instance to play:
 
-	```java
 	@SuppressWarnings("unchecked")
 	public <A> A getControllerInstance(Class<A> clazz) throws Exception {
 		if(clazz.equals(ControllersManager.class)) {
@@ -47,7 +38,6 @@ Then, provide the instance to play:
 		}
 		return super.getControllerInstance(clazz);
 	}
-	```
 
 Finaly, add routes of the module in your `routes.conf`:
 
@@ -59,13 +49,11 @@ See [ebean sample](play-crud-tests/play-crud-ebean/) for an example.
 
 Create a Class in your app classpath that extends `fr.njin.play.crud.controllers.Crud`. Exemple with an entity `Task` with a `Long` id:
 
-	```java
 	public class Tasks extends Crud<Long, Task> {
     	public Tasks() {
         	super(Long.class, Task.class);
 	    }
 	}
-	```
 	
 play-crud will scan your classpath and add this controller to his list.
 
