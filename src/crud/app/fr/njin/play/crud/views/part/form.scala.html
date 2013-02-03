@@ -1,0 +1,144 @@
+@(controller : fr.njin.play.crud.controllers.Crud[_,_],
+    form: fr.njin.play.crud.controllers.form.CrudForm[_,_],
+    fieldName: String)
+
+
+@import play.data.Form
+@import fr.njin.play.crud.controllers.ControllersManager
+@import fr.njin.play.crud.controllers.form.CrudForm
+@import fr.njin.play.crud.core.FieldInfo.FormWidgetType
+@import fr.njin.play.crud.core.FieldInfo.FieldType
+@import fr.njin.play.crud.views.html.ui
+
+@info(field: Form.Field) = {
+    <div class="help-inline crud-constraints">
+        <div>
+        @if(field.format() != null) {
+            @Messages(field.format._1, field.format._2.mkString(", "))
+        }
+        </div>
+        <div>
+        @{field.constraints.map {c => Messages(c._1, c._2)}.mkString(", ")}
+        </div>
+    </div>
+    <div class="help-block">
+    @{field.errors.map {e => Messages(e.message, e.arguments)}.mkString(", ")}
+    </div>
+}
+
+@defining(form.getModelInfo.getFields.get(fieldName)) { fieldInfo =>
+    @defining(form.getForm.field(fieldInfo.getField.getName)) { field =>
+        @defining(CrudForm.nameToId(field.name())) { fieldId =>
+            @if(fieldInfo.isHidden) {
+                <input type="hidden" id="@fieldId" name="@field.name()" value="@field.value()">
+            }else{
+                @fieldInfo.getWidgetType match {
+                    case FormWidgetType.INPUT => {
+                        <div class="control-group @{"error".when(!field.errors().isEmpty())}">
+                            <label class="control-label" for="@fieldId">@Messages(fieldInfo.getDisplayName)</label>
+                            <div class="controls">
+                                @if(fieldInfo.getFieldType == FieldType.FILE) {
+                                    <div class="fileupload fileupload-new" data-provides="fileupload">
+                                        <div class="input-append">
+                                            <div class="uneditable-input span3"><i class="icon-file fileupload-exists"></i> <span class="fileupload-preview"></span></div>
+                                            <span class="btn btn-file">
+                                                <span class="fileupload-new">@Messages("crud.form.file.select")</span>
+                                                <span class="fileupload-exists">@Messages("crud.form.file.change")</span>
+                                                <input type="@fieldInfo.getFieldType.name().toLowerCase()" id="@fieldId" name="@field.name()">
+                                            </span>
+                                            <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">@Messages("crud.form.file.remove")</a>
+                                        </div>
+                                    </div>
+                                }else{
+                                    @if(fieldInfo.getFieldType == FieldType.DATE) {
+                                        <div class="input-append date" data-provides="date" data-format="@if(field.format() != null){@field.format._2.mkString(",")}">
+                                            <input class="span2 auto-kal" type="text" id="@fieldId" name="@field.name()" value="@field.valueOr("")">
+                                            <span class="add-on"><i class="icon-calendar"></i></span>
+                                        </div>
+                                    }else{
+                                        <input class="span3" type="@fieldInfo.getFieldType.name().toLowerCase()" id="@fieldId" name="@field.name()" value="@field.valueOr("")">
+                                    }
+                                }
+
+                                @info(field)
+
+                                @if(fieldInfo.getFieldType == FieldType.FILE && field.valueOr("") != "") {
+                                <div class="row">
+                                    <div class="span3">
+                                        <div class="well well-small">
+                                            <a href="@fr.njin.play.crud.controllers.routes.ControllersManager.attachment(form.getModelInfo.getName, form.getUrlId, field.name())">@Messages("crud.form.file.current.download")</a>
+                                            <label class="checkbox" for="@{fieldId}Delete"><input type="checkbox" id="@{fieldId}Delete" name="@{field.name()}Delete" value="true"> @Messages("crud.form.file.current.remove")</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    case FormWidgetType.TEXTAREA => {
+                        <div class="control-group @{"error".when(!field.errors().isEmpty())}">
+                            <label class="control-label" for="@fieldId">@Messages(fieldInfo.getDisplayName)</label>
+                            <div class="controls">
+                                <textarea class="span3" name="@field.name()" id="@fieldId" cols="@fieldInfo.getTextAreaInfo.col" rows="@fieldInfo.getTextAreaInfo.row">@field.valueOr("")</textarea>
+                                @info(field)
+                            </div>
+                        </div>
+                    }
+                    case FormWidgetType.CHECKBOX => {
+                        <div class="control-group @{"error".when(!field.errors().isEmpty())}">
+                            <label class="control-label" for="@fieldId">@Messages(fieldInfo.getDisplayName)</label>
+                            <div class="controls">
+                                <input type="checkbox" id="@fieldId" name="@field.name()" value="true" @{"checked".when(field.valueOr("false") == "true")}>
+                                @info(field)
+                            </div>
+                        </div>
+                    }
+                    case FormWidgetType.RADIO_BUTTONS => {
+                        <div class="control-group @{"error".when(!field.errors().isEmpty())}">
+                            <label class="control-label">@Messages(fieldInfo.getDisplayName)</label>
+                            <div class="controls">
+                                @if(!fieldInfo.isRequired) {
+                                    <label class="radio" for="@field.id"><input type="radio" id="@field.id" name="@field.name()" value="" @{"checked".when(field.valueOr("") == "")}> @ui.formSelectNone(Messages(field.name))</label>
+                                }
+                                @for(option <- controller.options(fieldInfo)) {
+                                    <label class="radio" for="@{CrudForm.nameToId(field.name()+"_"+option._1)}"><input type="radio" id="@{CrudForm.nameToId(field.name()+"_"+option._1)}" name="@field.name()" value="@option._1" @{"checked".when(field.valueOr("") == option._1)}>@Messages(option._2)</label>
+                                }
+                                @info(field)
+                            </div>
+                        </div>
+                    }
+                    case FormWidgetType.SELECT => {
+                        @if(fieldInfo.isRelation) {
+                            @defining(ControllersManager.getInstance().getModel(fieldInfo.getFieldClass).get()) { relationModelInfo =>
+                                <div class="control-group @{"error".when(!field.errors().isEmpty())}">
+                                    <label class="control-label" for="@fieldId">@Messages(fieldInfo.getDisplayName)</label>
+                                    <div class="controls">
+                                        @relation(controller, form, field, fieldInfo, relationModelInfo)
+                                        @info(field)
+                                    </div>
+                                </div>
+                            }
+                        }else{
+                            @defining(fieldInfo.getField.getName) { name =>
+                                <div class="control-group @{"error".when(!field.errors().isEmpty())}">
+                                    <label class="control-label" for="@fieldId">@Messages(fieldInfo.getDisplayName)</label>
+                                    <div class="controls">
+                                        <select name="@name" id="@fieldId" @{"multiple=\"multiple\"".when(fieldInfo.isMultiple)}>
+                                            @for(option <- controller.options(fieldInfo)) {
+                                                <option value="@option._1" @{"checked".when(field.valueOr("") == option._1)}>@option._2</option>
+                                            }
+                                        </select>
+                                        @info(field)
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                    case _ => {
+                        <div>TODO</div>
+                    }
+                }
+            }
+        }
+    }
+}

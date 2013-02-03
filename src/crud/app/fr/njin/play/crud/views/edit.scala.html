@@ -1,0 +1,34 @@
+@(controller : fr.njin.play.crud.controllers.Crud[_,_],
+    modelInfo: fr.njin.play.crud.core.ModelInfo,
+    form: fr.njin.play.crud.controllers.form.CreateForm[_,_],
+    fields: java.lang.Iterable[fr.njin.play.crud.core.FieldInfo],
+    id: String)
+
+@import fr.njin.play.crud.views.html.ui
+
+@layout(ui.editViewTitle(modelInfo.getName, id), modelInfo.getName) {
+
+    <div class="page-header">
+        <h1>@ui.editViewPageHeader(modelInfo.getName, id)</h1>
+    </div>
+
+    @if(form.getForm.hasErrors) {
+        <div class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            @ui.formError(modelInfo.getName)
+        </div>
+    }
+
+    <div>
+        @helper.form(fr.njin.play.crud.controllers.routes.ControllersManager.update(modelInfo.getName, id), 'enctype->"multipart/form-data", 'class->"form-horizontal") {
+            @for(field <- javaCollectionToScala(fields)) {
+                @form.html(field.getField.getName)
+            }
+            <div class="form-actions">
+                <a href="@fr.njin.play.crud.controllers.routes.ControllersManager.list(modelInfo.getName)" class="btn"><i class="icon-remove"></i> <span>@ui.editCancel(modelInfo.getName, id)</span></a>
+                <button type="submit" class="btn btn-primary"><i class="icon-ok icon-white"></i> <span>@ui.editSave(modelInfo.getName, id)</span></button>
+            </div>
+        }
+    </div>
+
+}

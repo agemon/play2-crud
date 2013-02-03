@@ -1,0 +1,43 @@
+@(controller : fr.njin.play.crud.controllers.Crud[_,_],
+    modelInfo: fr.njin.play.crud.core.ModelInfo,
+    form: fr.njin.play.crud.controllers.form.ShowForm[_,_],
+    fields: java.lang.Iterable[fr.njin.play.crud.core.FieldInfo],
+    partial: Boolean = false)
+
+@import fr.njin.play.crud.views.html.ui
+
+@showit = {
+    @for(field <- javaCollectionToScala(fields)) {
+        <div class="row-fluid">
+            <div class="span4">
+            @Messages(field.getDisplayName)
+            </div>
+            <div class="span6">
+            @form.html(field.getField.getName)
+            </div>
+        </div>
+    }
+}
+
+@if(partial){
+    @showit
+}else{
+    @layout(ui.showViewTitle(modelInfo.getName, form.getId.toString), modelInfo.getName) {
+        <div class="row-fluid">
+            <div class="span12">
+                <a href="@fr.njin.play.crud.controllers.routes.ControllersManager.list(modelInfo.getName)" class="btn"><i class="icon-th-list crud-show-actions"></i> <span>@ui.showReturnToList(modelInfo.getName)</span></a>
+                <a href="@fr.njin.play.crud.controllers.routes.ControllersManager.edit(modelInfo.getName, form.getUrlId)" class="btn btn-primary crud-show-actions"><i class="icon-edit icon-white"></i> <span>@ui.showEdit(modelInfo.getName)</span></a>
+                <div class="pull-right">
+                    <form action="@fr.njin.play.crud.controllers.routes.ControllersManager.delete(modelInfo.getName, form.getUrlId)" method="post" onsubmit="return confirm('@ui.showDeleteConfirm(modelInfo.getName, form.getId.toString)');">
+                        <button type="submit" class="btn btn-danger crud-show-actions"><i class="icon-remove icon-white"></i> <span>@ui.showDelete(modelInfo.getName)</span></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="page-header">
+            <h1>@ui.showViewPageHeader(modelInfo.getName, form.getId.toString)</h1>
+        </div>
+
+        @showit
+    }
+}

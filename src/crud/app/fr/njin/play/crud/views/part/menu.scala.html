@@ -1,0 +1,22 @@
+@(current: String)
+
+@import fr.njin.play.crud.controllers.ControllersManager
+@import fr.njin.play.crud.views.html.ui
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <a href="#" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="@fr.njin.play.crud.controllers.routes.ControllersManager.dashboard()">@ui.appName</a>
+            <ul class="nav nav-collapse">
+                @for(item <- javaCollectionToScala(ControllersManager.getInstance().modelWithController)) {
+                    <li class="@{"active".when(item == current)}"><a href="@fr.njin.play.crud.controllers.routes.ControllersManager.index(item)">@Messages(item)</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

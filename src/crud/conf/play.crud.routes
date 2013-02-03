@@ -1,0 +1,16 @@
+# Routes
+# ~~~~
+
+GET     /                               @fr.njin.play.crud.controllers.ControllersManager.dashboard()
+GET		/:name		                    @fr.njin.play.crud.controllers.ControllersManager.index(name: String)
+GET		/:name/list		                @fr.njin.play.crud.controllers.ControllersManager.list(name: String, forRelation: Boolean ?= false, p: Integer ?= 0, q: String ?= null, o: String ?= null)
+GET		/:name/show/:id	                @fr.njin.play.crud.controllers.ControllersManager.show(name: String, id: String, modal: Boolean ?= false)
+GET		/:name/create	                @fr.njin.play.crud.controllers.ControllersManager.create(name: String)
+POST    /:name/save		                @fr.njin.play.crud.controllers.ControllersManager.save(name: String)
+GET		/:name/edit/:id	                @fr.njin.play.crud.controllers.ControllersManager.edit(name: String, id: String)
+POST	/:name/edit/:id	                @fr.njin.play.crud.controllers.ControllersManager.update(name: String, id: String)
+POST	/:name/delete/:id	            @fr.njin.play.crud.controllers.ControllersManager.delete(name: String, id: String)
+GET		/:name/attachment/:id/:field	@fr.njin.play.crud.controllers.ControllersManager.attachment(name: String, id: String, field: String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)

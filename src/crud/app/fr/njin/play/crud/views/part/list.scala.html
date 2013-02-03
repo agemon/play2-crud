@@ -1,0 +1,61 @@
+@(crudController : fr.njin.play.crud.controllers.Crud[_,_],
+    form: fr.njin.play.crud.controllers.form.CrudForm[_,_],
+    fieldName: String,
+    forList: Boolean)
+@import fr.njin.play.crud.core.FieldInfo.FieldType
+
+@import fr.njin.play.crud.controllers.ControllersManager
+@import fr.njin.play.crud.core.ModelInfo
+
+@defining(form.getFieldInfo(fieldName)) { fieldInfo =>
+    @defining(form.getField(fieldName).valueOr("")) { value =>
+        <div class="@fieldName">
+        @if(fieldInfo.isId) {
+            @defining(form.getRowId+"IDView") { rowIdView =>
+                @if(forList) {
+                    @modal(form.getModelInfo, form.getUrlId, rowIdView, value, true)
+                }else{
+                    @value
+                }
+            }
+        }else{
+            @if(fieldInfo.isRelation) {
+                @defining(ControllersManager.getInstance().getModel(fieldInfo.getFieldClass).get()) { modelInfo =>
+                    @if(fieldInfo.isMultiple) {
+                        <ul>
+                        @helper.repeat(form.getForm.field(fieldInfo.getField.getName), 0) { field =>
+                            <li>
+                            @if(true) {
+                                @modal(modelInfo, form.getRelationUrlId(modelInfo, field), form.getRelationRowId(modelInfo, field), field.value.get, forList)
+                            }else{
+                                @field.value.get
+                            }
+                            </li>
+                        }
+                        </ul>
+                    }else{
+                        @defining(form.getForm.field(fieldInfo.getField.getName)) { field =>
+                            @if(true && field.valueOr("") != "") {
+                                @modal(modelInfo, form.getRelationUrlId(modelInfo, field), form.getRelationRowId(modelInfo, field), field.value, forList)
+                            }else{
+                                @field.value
+                            }
+                        }
+                    }
+                }
+            }else{
+                @if(fieldInfo.getFieldType == FieldType.BOOLEAN) {
+                    @Messages(value)
+                }else{
+                    @if(fieldInfo.getFieldType == FieldType.FILE) {
+                        <a href="@fr.njin.play.crud.controllers.routes.ControllersManager.attachment(form.getModelInfo.getName, form.getUrlId, fieldName)">@Messages("crud.list.file.download")</a>
+                    }else{
+                        @value
+                    }
+                }
+            }
+        }
+        </div>
+    }
+}
+

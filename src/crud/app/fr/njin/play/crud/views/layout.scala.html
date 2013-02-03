@@ -1,0 +1,56 @@
+@(title: String, currentMenu: String, withMenuBar: Boolean = true)(content: Html, scripts: Html = Html(""), styles: Html = Html(""))
+
+@import fr.njin.play.crud.controllers.Crud
+@import fr.njin.play.crud.controllers.ControllersManager
+@import fr.njin.play.crud.views.html.ui
+
+@minified=@{ if (play.Play.isProd()) ".min" else "" }
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>@title</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="@routes.Assets.at("bootstrap/css/bootstrap.min.css")" rel="stylesheet">
+        <link href="@routes.Assets.at("jasny-bootstrap/css/jasny-bootstrap.min.css")" rel="stylesheet">
+        <link href="@routes.Assets.at("bootstrap/css/bootstrap-responsive.min.css")" rel="stylesheet">
+        <link href="@routes.Assets.at("jasny-bootstrap/css/jasny-bootstrap-responsive.min.css")" rel="stylesheet">
+        <link href="@routes.Assets.at("stylesheets/admin"+ minified + ".css")" rel="stylesheet" media="screen">
+        @styles
+    </head>
+    <body>
+        @if(withMenuBar) {
+            @part.menu(currentMenu)
+        }
+
+        <div class="main">
+            <div class="container-fluid">
+                @if(flash().containsKey(Crud.FLASH_SUCCESS_KEY)) {
+                    <div class="alert alert-block alert-success">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        @Html(flash().get(Crud.FLASH_SUCCESS_KEY))
+                    </div>
+                }
+                @if(flash().containsKey(Crud.FLASH_ERROR_KEY)) {
+                    <div class="alert alert-block alert-success">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        @Html(flash().get(Crud.FLASH_ERROR_KEY))
+                    </div>
+                }
+            </div>
+
+            <div class="container-fluid">
+                @content
+            </div>
+        </div>
+
+        <script src="@routes.Assets.at("javascripts/json2"+ minified + ".js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("bootstrap/js/bootstrap.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("jasny-bootstrap/js/jasny-bootstrap.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/crud"+ minified + ".js")" type="text/javascript"></script>
+        @scripts
+    </body>
+</html>

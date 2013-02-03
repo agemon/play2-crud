@@ -1,0 +1,115 @@
+@(controller : fr.njin.play.crud.controllers.Crud[_,_],
+    modelInfo: fr.njin.play.crud.core.ModelInfo,
+    fields: java.lang.Iterable[fr.njin.play.crud.core.FieldInfo],
+    page: fr.njin.play.crud.core.Page[_],
+    searchQuery: Option[String],
+    sort: Option[fr.njin.play.crud.core.Sort],
+    forRelation: Boolean)
+
+@import fr.njin.play.crud.core.Sort.Direction
+
+@import fr.njin.play.crud.core.Sort
+@import fr.njin.play.crud.core.FieldInfo
+@import fr.njin.play.crud.controllers.routes._
+@import fr.njin.play.crud.views.html.ui
+
+@layout(ui.listViewTitle(modelInfo.getName), modelInfo.getName, !forRelation) {
+
+    <div class="page-header">
+        <h1>@ui.listViewPageHeader(modelInfo.getName)</h1>
+    </div>
+
+    <div class="well">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="pull-left">
+                @helper.form(ControllersManager.list(modelInfo.getName), 'class->"form") {
+                    <input type="hidden" name="forRelation" value="@forRelation">
+                    <div class="input-append">
+                        <input class="xinput" type="text" name="q" value="@searchQuery.getOrElse("")">
+                        @if(searchQuery.isDefined) {
+                            <a href="@ControllersManager.list(modelInfo.getName, forRelation)" class="btn"><i class="icon-remove"></i><span> @ui.listSearchCancel(modelInfo.getName)</span></a>
+                        }
+                        <button type="submit" class="btn"><i class="icon-search"></i> <span>@ui.listSearch(modelInfo.getName)</span></button>
+                    </div>
+                }
+                </div>
+                @if(!forRelation) {
+                    <div class="pull-right">
+                        <a href="@fr.njin.play.crud.controllers.routes.ControllersManager.create(modelInfo.getName)" class="btn btn-primary pull-right"><i class="icon-plus icon-white"></i> <span>@ui.listCreate(modelInfo.getName)</span></a>
+                    </div>
+                }
+            </div>
+        </div>
+        <!--
+        <div class="row-fluid">
+            <div class="span12">
+                <a class="" data-toggle="collapse" data-parent="#filters" href="#filterFields">Filter</a>
+                <div id="filterFields" class="collapse">
+                    TODO
+                </div>
+            </div>
+        </div>
+        -->
+    </div>
+
+    <div class="data">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    @for(field <- javaCollectionToScala(fields)) {
+                    <th>
+                        @if(field.isSortable) {
+                            @defining(controller.getSortKey(modelInfo, field.getField.getName)) { sortKey =>
+                                @defining(sort.getOrElse(new Sort()).newWithKey(sortKey)) { s =>
+                                    <a href="@ControllersManager.list(modelInfo.getName, forRelation, page.getPageIndex ,searchQuery.getOrElse(null), s.toString)">@Messages(field.getDisplayName)
+                                        @defining(sort.getOrElse(new Sort()).getOrder(sortKey)) { o =>
+                                            @if(o != null) {
+                                                <i class="icon-chevron-@{o.direction match {case Direction.asc => "down" case _ => "up"}}"></i>
+                                            }
+                                        }
+                                    </a>
+                                }
+                            }
+                        }else{
+                            @Messages(field.getDisplayName)
+                        }
+                    </th>
+                    }
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @defining(javaCollectionToScala(controller.dataToForm(modelInfo, page.getList))) { table =>
+                @for(row <- table) {
+                    <tr id="@row.getRowId">
+                    @for(field <- javaCollectionToScala(fields)) {
+                        <td class="@field.getField.getName">@row.html(field.getField.getName)</td>
+                    }
+                    @if(forRelation){
+                        <td>
+                            <a href="#" class="btn btn-small btn-success crud-list-action" onclick="window.opener.onChoose(window.name, '@row.getId', '@row.getForm.value.get'); window.close();"><i class="icon-ok icon-white"></i> <span>@ui.listChoose(modelInfo.getName)</span></a>
+                        </td>
+                    }else{
+                        <td>
+                            <a class="btn btn-small crud-list-action" href="@fr.njin.play.crud.controllers.routes.ControllersManager.show(modelInfo.getName, row.getUrlId)"><i class="icon-share-alt"></i> <span>@ui.listView(modelInfo.getName)</span></a>
+                            <a class="btn btn-small crud-list-action" href="@fr.njin.play.crud.controllers.routes.ControllersManager.edit(modelInfo.getName, row.getUrlId)"><i class="icon-edit"></i> <span>@ui.listEdit(modelInfo.getName)</span></a>
+                        </td>
+                    }
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination pagination-centered">
+    <p>@ui.listDisplayingXofY(modelInfo.getName, page.getPageIndex * controller.getFetchCount + page.getList.size(), page.getTotalRowCount)</p>
+    @if(page.getTotalPageCount > 1) {
+        @defining(sort match {case Some(x) => x.toString case None => null}) { sString =>
+            @part.paginate(page.getPageIndex, page.getTotalPageCount, ControllersManager.list(modelInfo.getName, forRelation,_,searchQuery.getOrElse(null), sString))
+        }
+    }
+    </div>
+
+}

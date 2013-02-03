@@ -1,0 +1,33 @@
+@(controller : fr.njin.play.crud.controllers.Crud[_,_],
+    modelInfo: fr.njin.play.crud.core.ModelInfo,
+    form: fr.njin.play.crud.controllers.form.CreateForm[_,_],
+    fields: java.lang.Iterable[fr.njin.play.crud.core.FieldInfo])
+
+@import fr.njin.play.crud.views.html.ui
+
+@layout(ui.createViewTitle(modelInfo.getName), modelInfo.getName) {
+
+    <div class="page-header">
+        <h1>@ui.createViewPageHeader(modelInfo.getName)</h1>
+    </div>
+
+    @if(form.getForm.hasErrors) {
+        <div class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            @ui.formError(modelInfo.getName)
+        </div>
+    }
+
+    <div>
+        @helper.form(fr.njin.play.crud.controllers.routes.ControllersManager.save(modelInfo.getName), 'class->"form-horizontal") {
+            @for(field <- javaCollectionToScala(fields)) {
+                @form.html(field.getField.getName)
+            }
+            <div class="form-actions">
+                <a href="@fr.njin.play.crud.controllers.routes.ControllersManager.list(modelInfo.getName)" class="btn"><i class="icon-remove"></i> <span>@ui.createCancel(modelInfo.getName)</span></a>
+                <button type="submit" class="btn btn-primary"><i class="icon-ok icon-white"></i> <span>@ui.createSave(modelInfo.getName)</span></button>
+            </div>
+        }
+    </div>
+
+}

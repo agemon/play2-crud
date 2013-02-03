@@ -1,0 +1,53 @@
+@(page:Int, pageCount:Int, route:Int => Call, bound:Int = 5)
+
+@import fr.njin.play.crud.views.html.ui
+
+@highbound() = @{
+    if (page+bound > pageCount)
+        pageCount-1
+    else
+        page+bound-1
+}
+
+        <ul>
+            @if(page == 0){
+                <li class="disabled"><span>@ui.paginatePrevious</span></li>
+            } else {
+                <li><a href="@route(page-1)">@ui.paginatePrevious</a></li>
+
+            }
+
+            @if(page < bound) {
+                <li class="disabled"><span>&laquo;</span></li>
+            } else {
+                @if(page-bound <= 0) {
+                    <li><a href="@route(0)">&laquo;</a></li>
+                } else {
+                    <li><a href="@route(page-bound)">&laquo;</a></li>
+                }
+            }
+
+            @for(i <- (page-bound).max(0) until page) {
+                <li><a href="@route(i)">@{i+1}</a></li>
+            }
+
+            <li class="active"><a href="#">@{page+1}</a></li>
+
+
+            @for(i <- page+1 to highbound()) {
+                <li><a href="@route(i)">@{i+1}</a></li>
+            }
+
+            @if(highbound() + 1 < pageCount) {
+                <li><a href="@route(highbound()+1)">&raquo;</a></li>
+            } else {
+                <li class="disabled"><span>&raquo;</span></li>
+            }
+
+            @if(page < pageCount - 1) {
+                <li><a href="@route(page+1)">@ui.paginateNext</a></li>
+            } else {
+                <li class="disabled"><span>@ui.paginateNext</span></li>
+
+            }
+        </ul>

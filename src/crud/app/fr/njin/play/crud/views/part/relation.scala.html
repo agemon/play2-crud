@@ -1,0 +1,41 @@
+@(controller : fr.njin.play.crud.controllers.Crud[_,_],
+    form: fr.njin.play.crud.controllers.form.CrudForm[_,_],
+    field: play.data.Form.Field,
+    fieldInfo: fr.njin.play.crud.core.FieldInfo,
+    relationModelInfo: fr.njin.play.crud.core.ModelInfo)
+
+@import fr.njin.play.crud.controllers.ControllersManager
+@import fr.njin.play.crud.controllers.form.CrudForm
+@import fr.njin.play.crud.views.html.ui
+
+@defining(relationModelInfo.getId.getField.getName) { rname =>
+<div id="Datas@field.id" class="relation-datas" data-relation-id="@rname" data-field-id="@field.id" data-field-name="@field.name" data-is-multiple="@fieldInfo.isMultiple">
+    <input id="Datas@{field.id}DefaultValue" type="hidden" name="@{field.name+"."+rname}" value="">
+@if(fieldInfo.isMultiple) {
+    @helper.repeat(field, 0) { rfield =>
+        <div>
+            <input type="hidden" id="@rfield.id" name="@rfield(rname).name" value="@rfield(rname).value">
+            <a href="#" rel="remove" title="Remove"><i class="icon-remove"></i></a>
+            <span>@rfield.value</span>
+        </div>
+    }
+}else{
+    @if(field.value != null) {
+        <div>
+            <input type="hidden" id="@field.id" name="@field.sub(rname).name" value="@field.sub(rname).value">
+            <a href="#" rel="remove" title="Remove"><i class="icon-remove"></i></a>
+            <span>@field.value</span>
+        </div>
+    }
+}
+</div>
+<a href="#" class="btn btn-small" onclick="window.open('@fr.njin.play.crud.controllers.routes.ControllersManager.list(relationModelInfo.getName, true)','Datas@field.id','height=300,width=600'); return false;">
+    <i class="icon-chevron-right"></i> <span>
+    @if(fieldInfo.isMultiple) {
+        @ui.formRelationChoose(relationModelInfo.getName)
+    }else{
+        @ui.formRelationMultipleChoose(relationModelInfo.getName)
+    }
+    </span>
+</a>
+}
