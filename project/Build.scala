@@ -32,7 +32,9 @@ object PlayCrudBuild extends Build {
 
     lazy val PlayCrudEbean = play.Project(PlayCrudName+"-ebean", PlayCrudVersion, PlayCrudEbeanDependencies, file("src/ebean")).settings(
     	crossPaths := false,
-      	organization := PlayCrudOrganisation
+      	organization := PlayCrudOrganisation,
+
+      	publishArtifact in (Compile, packageDoc) := false
 
     ).dependsOn(PlayCrudCore)
 
