@@ -1,5 +1,6 @@
 package fr.njin.play.crud.ebean;
 
+import com.avaje.ebean.annotation.Formula;
 import fr.njin.play.crud.core.FieldInfo;
 import fr.njin.play.crud.core.annotation.Crud;
 import fr.njin.play.crud.core.annotation.CrudWidget;
@@ -17,6 +18,7 @@ public class EbeanFieldInfo extends FieldInfo {
         super();
         setField(field);
         setFieldClass(field.getType());
+        setEditable(true);
         setSelectable(true);
         setSearchable(true);
         setSortable(true);
@@ -28,6 +30,8 @@ public class EbeanFieldInfo extends FieldInfo {
         if(getField().isAnnotationPresent(Id.class))
             setId(true);
 
+        if(getField().isAnnotationPresent(Formula.class))
+            setEditable(false);
 
         if (getField().isAnnotationPresent(OneToOne.class) || getField().isAnnotationPresent(ManyToOne.class)) {
             setSelectable(false);
@@ -35,6 +39,17 @@ public class EbeanFieldInfo extends FieldInfo {
             setFieldType(FieldType.RELATION);
             setFieldClass(getField().getType());
             setWidgetType(FormWidgetType.SELECT);
+
+            if (getField().isAnnotationPresent(OneToOne.class)) {
+                OneToOne annotation = getField().getAnnotation(OneToOne.class);
+                setRequired(!annotation.optional());
+            }
+
+            if (getField().isAnnotationPresent(ManyToOne.class)) {
+                ManyToOne annotation = getField().getAnnotation(ManyToOne.class);
+                setRequired(!annotation.optional());
+            }
+
         }
 
         if (getField().isAnnotationPresent(OneToMany.class) || getField().isAnnotationPresent(ManyToMany.class)) {
@@ -45,6 +60,21 @@ public class EbeanFieldInfo extends FieldInfo {
             setFieldClass((Class) ((ParameterizedType) getField().getGenericType()).getActualTypeArguments()[0]);
             setWidgetType(FormWidgetType.SELECT);
             setMultiple(true);
+
+            if (getField().isAnnotationPresent(OneToMany.class)) {
+                OneToMany annotation = getField().getAnnotation(OneToMany.class);
+                if(!annotation.mappedBy().trim().isEmpty()) {
+                    setEditable(false);
+                }
+            }
+
+            if (getField().isAnnotationPresent(ManyToMany.class)) {
+                ManyToMany annotation = getField().getAnnotation(ManyToMany.class);
+                if(!annotation.mappedBy().trim().isEmpty()) {
+                    setEditable(false);
+                }
+            }
+
         }
 
         if (CharSequence.class.isAssignableFrom(getField().getType())) {
@@ -97,6 +127,7 @@ public class EbeanFieldInfo extends FieldInfo {
             }
             setHidden(annotation.hidden());
             setIgnored(annotation.ignored());
+            setEditable(annotation.editable());
             setSelectable(annotation.selectable());
             setSearchable(annotation.searchable());
             setSortable(annotation.sortable());

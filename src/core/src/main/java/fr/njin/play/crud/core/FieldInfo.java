@@ -1,5 +1,7 @@
 package fr.njin.play.crud.core;
 
+import java.lang.Override;
+import java.lang.String;
 import java.lang.reflect.Field;
 
 public class FieldInfo {
@@ -29,6 +31,7 @@ public class FieldInfo {
     private boolean isId;
     private String screenName;
     private boolean isMultiple;
+    private boolean isEditable;
     private boolean isSelectable;
     private boolean isSearchable;
     private boolean isSortable;
@@ -80,6 +83,14 @@ public class FieldInfo {
 
     public void setMultiple(boolean multiple) {
         isMultiple = multiple;
+    }
+
+    public boolean isEditable() {
+        return isEditable;
+    }
+
+    public void setEditable(boolean editable) {
+        isEditable = editable;
     }
 
     public boolean isSelectable() {
@@ -168,8 +179,9 @@ public class FieldInfo {
                 "field=" + field +
                 ", fieldClass=" + fieldClass +
                 ", isId=" + isId +
-                ", screenName='" + screenName + '\'' +
+                ", screenName=" + screenName +
                 ", isMultiple=" + isMultiple +
+                ", isEditable=" + isEditable +
                 ", isSelectable=" + isSelectable +
                 ", isSearchable=" + isSearchable +
                 ", isSortable=" + isSortable +

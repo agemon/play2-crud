@@ -263,6 +263,15 @@ public abstract class Crud<I,T> extends Controller {
         };
     }
 
+    private Predicate<FieldInfo> editableField() {
+        return new Predicate<FieldInfo>() {
+            @Override
+            public boolean apply(FieldInfo fieldInfo) {
+                return fieldInfo.isEditable();
+            }
+        };
+    }
+
     private Predicate<FieldInfo> relationField() {
         return new Predicate<FieldInfo>(){
             @Override
@@ -416,7 +425,7 @@ public abstract class Crud<I,T> extends Controller {
     protected List<FieldInfo> createFields(ModelInfo modelInfo) {
         Iterable<FieldInfo> fields = modelInfo.getFields().values();
 
-        Predicate<FieldInfo> filter = Predicates.and(Predicates.not(isIgnored()), new Predicate<FieldInfo>() {
+        Predicate<FieldInfo> filter = Predicates.and(editableField(), Predicates.not(isIgnored()), new Predicate<FieldInfo>() {
             @Override
             public boolean apply(FieldInfo fieldInfo) {
                 return !fieldInfo.isId();

@@ -23,8 +23,7 @@ object ApplicationBuild extends Build {
 
   val PlayCrudCore = Project(PlayCrudName+"-core", file("modules/core")).settings(
     crossPaths := false,
-    version := PlayCrudVersion,
-    scalaVersion := "2.10.0"
+    version := PlayCrudVersion
   )
 
   val PlayCrud = play.Project(PlayCrudName, PlayCrudVersion, PlayCrudDependencies, file("modules/crud")).settings(

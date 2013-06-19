@@ -13,6 +13,7 @@ public @interface Crud {
     boolean password() default false;
     boolean hidden() default false;
     boolean ignored() default false;
+    boolean editable() default true;
     boolean searchable() default true;
     boolean selectable() default true;
     boolean sortable() default true;
