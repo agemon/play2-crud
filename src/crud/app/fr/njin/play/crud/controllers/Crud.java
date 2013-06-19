@@ -149,9 +149,9 @@ public abstract class Crud<I,T> extends Controller {
             return badRequest(create.render(this, modelInfo, (CreateForm<?,?>)createForm, fields));
         } else {
             T object = form.get();
-            ((DataProvider<I,T>)dataProvider).save(object);
-
             proceedFiles(object, Iterables.filter(fields, isFile()));
+            object = onSave(object);
+            ((DataProvider<I,T>)dataProvider).save(object);
 
             try {
                 I idObject = (I)PropertyUtils.getProperty(object, modelInfo.getId().getField().getName());
@@ -193,11 +193,11 @@ public abstract class Crud<I,T> extends Controller {
             return badRequest(edit.render(this, modelInfo, (CreateForm<?, ?>) createForm, fields, idString));
         } else {
             T object = form.get();
-
             proceedFiles(object, Iterables.filter(fields, isFile()));
 
             try {
                 PropertyUtils.setProperty(object, modelInfo.getId().getField().getName(), id);
+                object = onUpdate(object);
                 ((DataProvider<I,T>)dataProvider).update(object);
                 I idObject = (I)PropertyUtils.getProperty(object, modelInfo.getId().getField().getName());
                 flash(FLASH_SUCCESS_KEY, fr.njin.play.crud.views.html.ui.flashUpdateSuccess(modelInfo.getName(), idObject.toString()));
@@ -358,6 +358,14 @@ public abstract class Crud<I,T> extends Controller {
                 }catch (NumberFormatException e){};
             }
         }
+    }
+
+    protected T onSave(T object) {
+        return object;
+    }
+
+    protected T onUpdate(T object) {
+        return object;
     }
 
     protected Html listView(ModelInfo modelInfo, Iterable<FieldInfo> fields, Page<T> data, Option<String> searchOption, Option<Sort> sortOption, boolean forRelation) {

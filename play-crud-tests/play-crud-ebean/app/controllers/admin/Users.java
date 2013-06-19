@@ -19,4 +19,5 @@ public class Users extends Crud<String, User> {
             }
         });
     }
+
 }
