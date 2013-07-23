@@ -8,7 +8,7 @@ A flexible Play framework 2.1 crud module. This module is in development, many f
 
 Add repository (snapshots for now) in `Build.scala` to your resolvers
 
-	resolvers += "njin github repository (snapshots)" at "http://njin-fr.github.com/repository/snapshots"
+	resolvers += Resolver.url("njin github repository (snapshots)", url("http://njin-fr.github.com/repository/snapshots"))(Resolver.ivyStylePatterns),
 
 Add the core module dependency
 

@@ -430,6 +430,7 @@ public abstract class Crud<I,T> extends Controller {
         return F.Option.None();
     }
 
+    @SuppressWarnings("unchecked")
     protected List<FieldInfo> createFields(ModelInfo modelInfo) {
         Iterable<FieldInfo> fields = modelInfo.getFields().values();
 

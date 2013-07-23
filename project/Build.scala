@@ -21,12 +21,20 @@ object PlayCrudBuild extends Build {
 		crossPaths := false,
 		version := PlayCrudVersion,
 		organization := PlayCrudOrganisation,
-		scalaVersion := "2.10.0"
+		scalaVersion := "2.10.0",
+
+		javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
+		// See : https://play.lighthouseapp.com/projects/82401/tickets/898-javadoc-error-invalid-flag-g-when-publishing-new-module-local
+		publishArtifact in (Compile, packageDoc) := false
 	)
 
     lazy val PlayCrud = play.Project(PlayCrudName, PlayCrudVersion, PlayCrudDependencies, file("src/crud")).settings(
     	crossPaths := false,
-      	organization := PlayCrudOrganisation
+      	organization := PlayCrudOrganisation,
+
+		javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
+		// See : https://play.lighthouseapp.com/projects/82401/tickets/898-javadoc-error-invalid-flag-g-when-publishing-new-module-local
+      	publishArtifact in (Compile, packageDoc) := false
 
     ).dependsOn(PlayCrudCore).aggregate(PlayCrudCore, PlayCrudEbean)
 
@@ -34,6 +42,8 @@ object PlayCrudBuild extends Build {
     	crossPaths := false,
       	organization := PlayCrudOrganisation,
 
+      	javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
+      	// See : https://play.lighthouseapp.com/projects/82401/tickets/898-javadoc-error-invalid-flag-g-when-publishing-new-module-local
       	publishArtifact in (Compile, packageDoc) := false
 
     ).dependsOn(PlayCrudCore)
